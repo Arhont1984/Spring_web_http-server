@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Request {
     private String path;
-    private Map parameters;
+    private Map<String, String> parameters;
 
     public Request(String requestLine) {
         String[] parts = requestLine.split(" ");
