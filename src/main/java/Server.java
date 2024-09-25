@@ -7,44 +7,15 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// Handler interface for processing requests
-@FunctionalInterface
-interface Handler {
-    void handle(Request request, BufferedOutputStream responseStream) throws IOException;
-}
-
 public class Server {
-    private final Map<String, Map<String, Handler>> handlers = new HashMap<>();
 
-    public void addHandler(String method, String path, Handler handler) {
-        handlers.computeIfAbsent(method, k -> new HashMap<>()).put(path, handler);
-    }
+    //Логика обработки запроса из лекции.
+    private static void RequestProcessing(Socket clientSocket) {
 
-    public void start() {
-        ExecutorService executorService = Executors.newFixedThreadPool(64);
-        try (final ServerSocket serverSocket = new ServerSocket(9999)) {
-            while (true) {
-                try {
-                    final Socket clientSocket = serverSocket.accept();
-                    executorService.submit(() -> requestProcessing(clientSocket));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            executorService.shutdown();
-        }
-    }
-
-    private void requestProcessing(Socket clientSocket) {
         final var validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
         while (true) {
 
@@ -55,7 +26,13 @@ public class Server {
                 // read only request line for simplicity
                 // must be in form GET /path HTTP/1.1
                 final var requestLine = in.readLine();
+                System.out.printf("requestLine: " + requestLine + "\n");
                 final var parts = requestLine.split(" ");
+                Request request = new Request(requestLine);
+
+                // Логика обработки хендлеров
+                System.out.println("Request Path: " + request.getPath());
+                System.out.println("Query Parameters: " + request.getParameters());
 
                 if (parts.length != 3) {
                     // just close socket
@@ -110,6 +87,26 @@ public class Server {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+        }
+    }
+
+    // Создаем пул потоков с фиксированным размером
+    public void Start() {
+        ExecutorService executorService = Executors.newFixedThreadPool(64);
+        try (final ServerSocket serverSocket = new ServerSocket(9999)) {
+            while (true) {
+                try {
+                    final Socket clientSocket = serverSocket.accept();
+                    executorService.submit(() -> RequestProcessing(clientSocket));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        } finally {
+            executorService.shutdown();
         }
     }
 }
