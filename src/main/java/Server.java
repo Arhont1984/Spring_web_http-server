@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,13 +27,17 @@ public class Server {
                 // read only request line for simplicity
                 // must be in form GET /path HTTP/1.1
                 final var requestLine = in.readLine();
-                System.out.printf("requestLine: " + requestLine + "\n");
+                System.out.printf("RequestLine: " + requestLine + "\n");
                 final var parts = requestLine.split(" ");
+
+
                 Request request = new Request(requestLine);
 
                 // Логика обработки хендлеров
                 System.out.println("Request Path: " + request.getPath());
                 System.out.println("Query Parameters: " + request.getParameters());
+                int number = 1;
+                System.out.println("Parameter with number " + number + " : " + request.GetOneParameter(number));
 
                 if (parts.length != 3) {
                     // just close socket
