@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +14,7 @@ import java.util.concurrent.Executors;
 public class Server {
 
     //Логика обработки запроса из лекции.
-    private static void RequestProcessing(Socket clientSocket) {
+    private static void requestProcessing(Socket clientSocket) {
 
         final var validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html", "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
         while (true) {
@@ -37,7 +36,7 @@ public class Server {
                 System.out.println("Request Path: " + request.getPath());
                 System.out.println("Query Parameters: " + request.getParameters());
                 int number = 1;
-                System.out.println("Parameter with number " + number + " : " + request.GetOneParameter(number));
+                System.out.println("Parameter with number " + number + " : " + request.getOneParameter(number));
 
                 if (parts.length != 3) {
                     // just close socket
@@ -96,13 +95,13 @@ public class Server {
     }
 
     // Создаем пул потоков с фиксированным размером
-    public void Start() {
+    public void start() {
         ExecutorService executorService = Executors.newFixedThreadPool(64);
         try (final ServerSocket serverSocket = new ServerSocket(9999)) {
             while (true) {
                 try {
                     final Socket clientSocket = serverSocket.accept();
-                    executorService.submit(() -> RequestProcessing(clientSocket));
+                    executorService.submit(() -> requestProcessing(clientSocket));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

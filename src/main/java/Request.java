@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Request {
-    private final String path;
-    private final Map<String, String> parameters;
+    private String path;
+    private Map<String, String> parameters;
     private List<NameValuePair> params;
 
     public Request(String requestLine) {
@@ -33,7 +33,7 @@ public class Request {
         params = URLEncodedUtils.parse(queryString, StandardCharsets.UTF_8);
     }
 
-    public NameValuePair GetOneParameter(Integer number) {
+    public NameValuePair getOneParameter(Integer number) {
         return params.get(number);
     }
 
